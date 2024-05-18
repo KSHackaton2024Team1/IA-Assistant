@@ -90,7 +90,7 @@ fastify.post('/assistant', async (request, reply) => {
     return myAssistant;
 });
 
-fastify.post('/thread', async (request, reply) => {
+fastify.get('/thread', async (request, reply) => {
     const thread = await openai.beta.threads.create();
     return thread;
 });
