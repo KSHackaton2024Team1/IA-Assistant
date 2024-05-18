@@ -72,11 +72,17 @@ fastify.get('/status', async (request, reply) => {
 
 // OpenAI API
 fastify.post('/welcome', async (request, reply) => {
-    const { name } = request.body;
+    const { name, thread } = request.body;
     try {
-        //const welcome = await getIAWelcome(name);
-        // return welcome;
-        return { message: `Hello, ${name}`};
+        const threadMessages = await openai.beta.threads.messages.create(
+            thread,
+            { role: "user", content: `{
+                "context": null
+                "message": <say hi to ${name}, don't return a context yet>
+            }`}
+        );
+
+        return threadMessages;
     } catch (error) {
         console.log(error);
         reply.code(500).send({ error: error });
