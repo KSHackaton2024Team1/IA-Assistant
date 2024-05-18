@@ -1,7 +1,9 @@
 import Fastify from 'fastify';
-import OpenAI from 'openai';
 import fastifyEnv from '@fastify/env';
-import cors from '@fastify/cors'
+import Cors from '@fastify/cors';
+import Auth from '@fastify/auth';
+import BasicAuth from '@fastify/basic-auth';
+import OpenAI from 'openai';
 
 let openai = {};
 
@@ -9,16 +11,18 @@ const fastify = Fastify({
     logger: true
 })
 
-fastify.get('/status', async (request, reply) => {
-    return { status: '🚀 Server is alive!!!' };
-});
-
 const start = async () => {
     const schema = {
         type: 'object',
-        required: [ 'OPENAI_API_KEY' ],
+        required: [ 'OPENAI_API_KEY', 'BASIC_USERNAME', 'BASIC_PASSWORD' ],
         properties: {
             OPENAI_API_KEY: {
+                type: 'string'
+            },
+            BASIC_USERNAME: {
+                type: 'string'
+            },
+            BASIC_PASSWORD: {
                 type: 'string'
             }
         }
@@ -33,15 +37,22 @@ const start = async () => {
 
     try {
         await fastify.register(fastifyEnv, options);
-        await fastify.register(cors, { 
+        await fastify.register(Cors, { 
             origin: '*',
             methods: ['POST', 'GET'],
             allowedHeaders: ['Content-Type', 'Authorization']
-        })
-        await fastify.listen({ port: 10000, host: '0.0.0.0' });
-        openai = new OpenAI({
-            apiKey: fastify.config.OPENAI_API_KEY, // defaults to process.env["OPENAI_API_KEY"]
         });
+        await fastify.register(Auth);
+        await fastify.register(BasicAuth, { validate, authenticate: false });
+        fastify.after(() => {
+            // use preHandler to authenticate all the routes
+            fastify.addHook('preHandler', fastify.auth([fastify.basicAuth]))
+        });
+        // await fastify.listen({ port: 10000, host: '0.0.0.0' }); // render conf
+        await fastify.listen({ port: 3000 }); // dev conf
+        // openai = new OpenAI({
+        //     apiKey: fastify.config.OPENAI_API_KEY, // defaults to process.env["OPENAI_API_KEY"]
+        // });
         fastify.log.info(`Server is listening in the port: ${fastify.server.address().port}`);
     } catch (err) {
         fastify.log.error(err);
@@ -49,15 +60,26 @@ const start = async () => {
     }
 };
 
-fastify.post('/say-hello', async (request, reply) => {
+const validate = async (username, password, req, reply) => {
+    if (username !== fastify.config.BASIC_USERNAME || password !== fastify.config.BASIC_PASSWORD) {
+        return new Error('Unauthorized');
+    }
+}
+
+fastify.post('/welcome', async (request, reply) => {
     const { name } = request.body;
     try {
-        const welcome = await getIAWelcome(name);
-        return welcome;
+        //const welcome = await getIAWelcome(name);
+        // return welcome;
+        return { message: `Hello, ${name}`};
     } catch (error) {
         console.log(error);
         reply.code(500).send({ error: error });
     }
+});
+
+fastify.get('/status', async (request, reply) => {
+    return { status: '🚀 Server is alive!!!' };
 });
 
 start();
