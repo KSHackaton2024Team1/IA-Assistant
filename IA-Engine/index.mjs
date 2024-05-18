@@ -74,17 +74,21 @@ fastify.get('/status', async (request, reply) => {
 fastify.post('/welcome', async (request, reply) => {
     const { name, thread } = request.body;
     try {
-        const run = await openai.beta.threads.createAndRun({
-            assistant_id: "asst_ax6rKbDv3pwzofLyptMBgwrB",
-            thread: {
-                messages: [
-                        { role: "user", content: "<say hi to ${name}, return a context as null just once>" },
-                    ],
-            },
-        });
+        const threadMessages = await openai.beta.threads.messages.create(
+            thread,
+            { role: "user", content: `<say hi to ${name}, return a context as null just once>`}
+        );
 
-        const response = run.data;
-        return reply.send(response);
+        const stream = await openai.beta.threads.runs.create(
+            thread,
+            { assistant_id: "asst_ax6rKbDv3pwzofLyptMBgwrB", stream: true }
+        );
+        
+        for await (const event of stream) {
+            console.log(event);
+        }
+
+        return threadMessages;
     } catch (error) {
         console.log(error);
         reply.code(500).send({ error: error });
