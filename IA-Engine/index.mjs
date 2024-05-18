@@ -90,7 +90,7 @@ fastify.post('/welcome', async (request, reply) => {
 
         return threadMessages;
     } catch (error) {
-        console.log(error);
+        console.log(JSON.stringify(error, null, 2));
         reply.code(500).send({ error: error });
     }
 });
