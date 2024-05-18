@@ -78,11 +78,20 @@ fastify.post('/welcome', async (request, reply) => {
             thread,
             { role: "user", content: `{
                 "context": null
-                "message": <say hi to ${name}, don't return a context yet>
+                "message": <say hi to ${name}, return a context as null just once>
             }`}
         );
 
-        return threadMessages;
+        const run = await openai.beta.threads.createAndRun({
+            assistant_id: "asst_ax6rKbDv3pwzofLyptMBgwrB",
+            thread: {
+                messages: [
+                        { role: "user", content: "<say hi to ${name}, return a context as null just once>" },
+                    ],
+            },
+        });
+
+        return run;
     } catch (error) {
         console.log(error);
         reply.code(500).send({ error: error });
