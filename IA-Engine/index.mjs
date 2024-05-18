@@ -48,8 +48,8 @@ const start = async () => {
             // use preHandler to authenticate all the routes
             fastify.addHook('preHandler', fastify.auth([fastify.basicAuth]))
         });
-        // await fastify.listen({ port: 10000, host: '0.0.0.0' }); // render conf
-        await fastify.listen({ port: 3000 }); // dev conf
+        await fastify.listen({ port: 10000, host: '0.0.0.0' }); // render conf
+        // await fastify.listen({ port: 3000 }); // dev conf
         openai = new OpenAI({
             apiKey: fastify.config.OPENAI_API_KEY, // defaults to process.env["OPENAI_API_KEY"]
         });
