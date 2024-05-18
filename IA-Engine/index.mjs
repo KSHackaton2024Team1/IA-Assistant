@@ -101,4 +101,9 @@ fastify.delete('/thread/:id', async (request, reply) => {
     return thread;
 });
 
+fastify.get('/models', async (request, reply) => {
+    const list = await openai.models.list();
+    return list;
+});
+
 start();
