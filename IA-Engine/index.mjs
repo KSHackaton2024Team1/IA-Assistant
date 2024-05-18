@@ -50,9 +50,9 @@ const start = async () => {
         });
         // await fastify.listen({ port: 10000, host: '0.0.0.0' }); // render conf
         await fastify.listen({ port: 3000 }); // dev conf
-        // openai = new OpenAI({
-        //     apiKey: fastify.config.OPENAI_API_KEY, // defaults to process.env["OPENAI_API_KEY"]
-        // });
+        openai = new OpenAI({
+            apiKey: fastify.config.OPENAI_API_KEY, // defaults to process.env["OPENAI_API_KEY"]
+        });
         fastify.log.info(`Server is listening in the port: ${fastify.server.address().port}`);
     } catch (err) {
         fastify.log.error(err);
@@ -66,6 +66,11 @@ const validate = async (username, password, req, reply) => {
     }
 }
 
+fastify.get('/status', async (request, reply) => {
+    return { status: '🚀 Server is alive!!!' };
+});
+
+// OpenAI API
 fastify.post('/welcome', async (request, reply) => {
     const { name } = request.body;
     try {
@@ -78,8 +83,22 @@ fastify.post('/welcome', async (request, reply) => {
     }
 });
 
-fastify.get('/status', async (request, reply) => {
-    return { status: '🚀 Server is alive!!!' };
+fastify.post('/assistant', async (request, reply) => {
+    const body = request.body;
+    const myAssistant = await openai.beta.assistants.create(body);
+
+    return myAssistant;
+});
+
+fastify.post('/thread', async (request, reply) => {
+    const thread = await openai.beta.threads.create();
+    return thread;
+});
+
+fastify.delete('/thread/:id', async (request, reply) => {
+    const { id } = request.params;
+    const thread = await openai.beta.threads.del(id);
+    return thread;
 });
 
 start();
