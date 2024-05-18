@@ -83,12 +83,13 @@ fastify.post('/welcome', async (request, reply) => {
             thread,
             { assistant_id: "asst_ax6rKbDv3pwzofLyptMBgwrB", stream: true }
         );
-        
+
+        let response = [];
         for await (const event of stream) {
-            console.log(event);
+            response.push(event);
         }
 
-        return threadMessages;
+        return response;
     } catch (error) {
         console.log(JSON.stringify(error, null, 2));
         reply.code(500).send({ error: error });
