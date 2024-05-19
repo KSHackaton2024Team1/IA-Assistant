@@ -87,12 +87,11 @@ fastify.post('/welcome', async (request, reply) => {
         let response;
         for await (const event of stream) {
             if(event.event === 'thread.message.completed') {
-                console.log(event.data.content[0].text.value);
                 response = event.data.content[0].text.value;
             }
         }
 
-        return JSON.parse(response);
+        return response;
     } catch (error) {
         console.log(JSON.stringify(error, null, 2));
         reply.code(500).send({ error: error });
