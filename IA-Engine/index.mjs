@@ -81,7 +81,7 @@ fastify.post('/welcome', async (request, reply) => {
 
         const stream = await openai.beta.threads.runs.create(
             thread,
-            { assistant_id: "asst_ax6rKbDv3pwzofLyptMBgwrB", stream: true }
+            { assistant_id: fastify.config.ASSISTANT_ID, stream: true }
         );
 
         let response;
