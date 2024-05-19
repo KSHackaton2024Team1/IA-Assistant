@@ -79,7 +79,7 @@ fastify.post('/welcome', async (request, reply) => {
     try {
         const threadMessages = await openai.beta.threads.messages.create(
             thread,
-            { role: "user", content: `<say hi to ${name}, return a context as null and options as null, just once>`}
+            { role: "system", content: `<say hi to ${name}, return a context as null and options as null, just once>`}
         );
 
         const stream = await openai.beta.threads.runs.create(
@@ -104,11 +104,14 @@ fastify.post('/welcome', async (request, reply) => {
 });
 
 fastify.post('/message', async (request, reply) => {
-    const { message, thread } = request.body;
+    const { message, context, thread } = request.body;
     try {
         const threadMessages = await openai.beta.threads.messages.create(
             thread,
-            { role: "user", content: message }
+            { role: "user", content: message `{
+                "context": ${context}
+                "message": ${message}
+            }`}
         );
 
         const stream = await openai.beta.threads.runs.create(
