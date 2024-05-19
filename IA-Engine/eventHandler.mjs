@@ -24,7 +24,7 @@ export class EventHandler {
 	async handleRequiresAction(data, runId, threadId) {
 		try {
 			const toolOutputs =
-			data.required_action.submit_tool_outputs.tool_calls.map(async (toolCall) => {
+			await data.required_action.submit_tool_outputs.tool_calls.map(async (toolCall) => {
 				console.log("tool_calls.map");
 				if (toolCall.function.name === "setPatientProperties") {
 					console.log("setPatientProperties: " + toolCall.function.arguments);
