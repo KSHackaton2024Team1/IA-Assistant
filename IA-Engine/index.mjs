@@ -80,13 +80,6 @@ const start = async () => {
         openai = new OpenAI({
             apiKey: fastify.config.OPENAI_API_KEY, // defaults to process.env["OPENAI_API_KEY"]
         });
-        console.log('loginUrl:', fastify.config.LOGIN_URL);
-        console.log('clientId:', fastify.config.CLIENT_ID);
-        console.log('clientSecret:', fastify.config.CLIENT_SECRET);
-        console.log('redirectUri:', fastify.config.REDIRECT_URI);
-        console.log('username:', fastify.config.USERNAME);
-        console.log('password:', fastify.config.PASSWORD);
-        console.log('securityToken:', fastify.config.SECURITY_TOKEN);
 
         conn = await login({
             loginUrl: fastify.config.LOGIN_URL,
