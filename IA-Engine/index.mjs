@@ -75,11 +75,11 @@ fastify.get('/status', async (request, reply) => {
 
 // OpenAI API
 fastify.post('/welcome', async (request, reply) => {
-    const { name, thread } = request.body;
+    const { name, id, thread } = request.body;
     try {
         const threadMessages = await openai.beta.threads.messages.create(
             thread,
-            { role: "user", content: `<say hi to ${name} (be creative with the welcome message), return a context as null and options as null, just once>`}
+            { role: "user", content: `<say hi to ${name} (be creative with the welcome message) (his/her id is ${id}), return a context as null and options as null, just once>`}
         );
 
         const stream = await openai.beta.threads.runs.create(
