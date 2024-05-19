@@ -88,7 +88,35 @@ fastify.post('/welcome', async (request, reply) => {
         for await (const event of stream) {
             if(event.event === 'thread.message.completed') {
                 response = event.data.content[0].text.value;
-                console.log(response);
+            }
+        }
+
+        const cleanedString = response.replace(/```json|```/g, '').trim();
+
+        return JSON.parse(cleanedString);
+    } catch (error) {
+        console.log(JSON.stringify(error, null, 2));
+        reply.code(500).send({ error: error });
+    }
+});
+
+fastify.post('/message', async (request, reply) => {
+    const { message, thread } = request.body;
+    try {
+        const threadMessages = await openai.beta.threads.messages.create(
+            thread,
+            { role: "user", content: message }
+        );
+
+        const stream = await openai.beta.threads.runs.create(
+            thread,
+            { assistant_id: fastify.config.ASSISTANT_ID, stream: true }
+        );
+
+        let response;
+        for await (const event of stream) {
+            if(event.event === 'thread.message.completed') {
+                response = event.data.content[0].text.value;
             }
         }
 
