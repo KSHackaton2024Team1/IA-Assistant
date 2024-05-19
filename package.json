@@ -37,8 +37,5 @@
     "**/{aura,lwc}/**/*.js": [
       "eslint"
     ]
-  },
-  "dependencies": {
-    "jsforce": "^1.11.1"
   }
 }
