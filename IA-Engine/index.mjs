@@ -175,7 +175,7 @@ fastify.post('/message', async (request, reply) => {
 
         let response;
         for await (const event of stream) {
-            console.log(event.event);
+            fastify.log.info(event.event);
             eventHandler.emit("event", event);
 
             if(event.event == "thread.message.completed") {
@@ -188,7 +188,7 @@ fastify.post('/message', async (request, reply) => {
         return JSON.parse(cleanedString);
         //*********************************************** */
     } catch (error) {
-        console.log(JSON.stringify(error, null, 2));
+        fastify.log.info(JSON.stringify(error, null, 2));
         reply.code(500).send({ error: error });
     }
 });
