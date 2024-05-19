@@ -136,7 +136,7 @@ fastify.post('/welcome', async (request, reply) => {
         eventHandler.on("event", eventHandler.onEvent.bind(eventHandler));
         const stream = await client.beta.threads.runs.stream(
             thread,
-            { assistant_id: fastify.config.ASSISTANT_ID },
+            { assistant_id: fastify.config.ASSISTANT_ID, stream: true },
             eventHandler,
         );
 
