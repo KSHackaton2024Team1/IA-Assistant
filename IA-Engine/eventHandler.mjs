@@ -1,8 +1,6 @@
 import { setPatientProperties, getPatientProperties } from './sf-utils.mjs';
-import { EventEmitter } from 'events';
-export class EventHandler extends EventEmitter {
+export class EventHandler {
 	constructor(client, conn) {
-		super();
 		this.client = client;
 		this.conn = conn;
 	}
@@ -11,7 +9,6 @@ export class EventHandler extends EventEmitter {
 		try {
 			// Retrieve events that are denoted with 'requires_action'
 			// since these will have our tool_calls
-			console.log("Event:", event.event);
 			if (event.event === "thread.run.requires_action") {
 				await this.handleRequiresAction(
 					event.data,

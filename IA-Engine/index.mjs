@@ -132,18 +132,15 @@ fastify.post('/welcome', async (request, reply) => {
 
         // return JSON.parse(cleanedString);
 
-        const eventHandler = new EventHandler(openai, conn);
-        eventHandler.on("event", eventHandler.onEvent.bind(eventHandler));
-        const stream = await client.beta.threads.runs.stream(
+        const stream = await openai.beta.threads.runs.create(
             thread,
-            { assistant_id: fastify.config.ASSISTANT_ID, stream: true },
-            eventHandler,
+            { assistant_id: fastify.config.ASSISTANT_ID, stream: true }
         );
+        const eventHandler = new EventHandler(openai, conn);
 
         let response;
         for await (const event of stream) {
-            fastify.log.info(event.event);
-            eventHandler.emit("event", event);
+            await eventHandler.onEvent(event);
 
             if(event.event == "thread.message.completed") {
 				response = event.data.content[0].text.value;
@@ -188,17 +185,15 @@ fastify.post('/message', async (request, reply) => {
 
         //*********************************************** */
         const eventHandler = new EventHandler(openai, conn);
-        eventHandler.on("event", eventHandler.onEvent.bind(eventHandler));
-        const stream = await client.beta.threads.runs.stream(
+        const stream = await openai.beta.threads.runs.create(
             thread,
-            { assistant_id: fastify.config.ASSISTANT_ID },
-            eventHandler,
+            { assistant_id: fastify.config.ASSISTANT_ID, stream: true }
         );
 
         let response;
         for await (const event of stream) {
             fastify.log.info(event.event);
-            eventHandler.emit("event", event);
+            await eventHandler.emit("event", event);
 
             if(event.event == "thread.message.completed") {
 				response = event.data.content[0].text.value;
