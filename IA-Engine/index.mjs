@@ -91,7 +91,12 @@ fastify.post('/welcome', async (request, reply) => {
             }
         }
 
-        return response;
+        let responseFormatted = str.substring(
+            str.indexOf("```json") + 1, 
+            str.lastIndexOf("```")
+        );
+
+        return responseFormatted;
     } catch (error) {
         console.log(JSON.stringify(error, null, 2));
         reply.code(500).send({ error: error });
