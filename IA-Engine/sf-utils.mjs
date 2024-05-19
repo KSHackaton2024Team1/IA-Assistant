@@ -40,9 +40,8 @@ export const login = async (properties) => {
 
     try{
         const userInfo = await conn.login(username, password+securityToken);
-        console.log(userInfo);
+
         return conn;
-    
     }catch(error){
         console.error('Error:', error);
     }

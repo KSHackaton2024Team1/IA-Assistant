@@ -4,8 +4,11 @@ import Cors from '@fastify/cors';
 import Auth from '@fastify/auth';
 import BasicAuth from '@fastify/basic-auth';
 import OpenAI from 'openai';
+import { EventHandler } from './eventHandler.mjs';
+import { login } from './sf-utils.mjs';
 
 let openai = {};
+let conn = {};
 
 const fastify = Fastify({
     logger: true
@@ -55,6 +58,15 @@ const start = async () => {
         // await fastify.listen({ port: 3000 }); // dev conf
         openai = new OpenAI({
             apiKey: fastify.config.OPENAI_API_KEY, // defaults to process.env["OPENAI_API_KEY"]
+        });
+        conn = await login({
+            loginUrl: fastify.config.LOGIN_URL,
+            clientId: fastify.config.CLIENT_ID,
+            clientSecret: fastify.config.CLIENT_SECRET,
+            redirectUri: fastify.config.REDIRECT_URI,
+            username: fastify.config.USERNAME,
+            password: fastify.config.PASSWORD,
+            securityToken: fastify.config.SECURITY_TOKEN
         });
         fastify.log.info(`Server is listening in the port: ${fastify.server.address().port}`);
     } catch (err) {
@@ -114,21 +126,44 @@ fastify.post('/message', async (request, reply) => {
             }`}
         );
 
-        const stream = await openai.beta.threads.runs.create(
+        // const stream = await openai.beta.threads.runs.create(
+        //     thread,
+        //     { assistant_id: fastify.config.ASSISTANT_ID, stream: true }
+        // );
+
+        // let response;
+        // for await (const event of stream) {
+        //     if(event.event === 'thread.message.completed') {
+        //         response = event.data.content[0].text.value;
+        //     }
+        // }
+
+        // const cleanedString = response.replace(/```json|```/g, '').trim();
+
+        // return JSON.parse(cleanedString);
+
+        //*********************************************** */
+        const eventHandler = new EventHandler(openai, conn);
+        eventHandler.on("event", eventHandler.onEvent.bind(eventHandler));
+        const stream = await client.beta.threads.runs.stream(
             thread,
-            { assistant_id: fastify.config.ASSISTANT_ID, stream: true }
+            { assistant_id: fastify.config.ASSISTANT_ID },
+            eventHandler,
         );
 
         let response;
         for await (const event of stream) {
-            if(event.event === 'thread.message.completed') {
-                response = event.data.content[0].text.value;
-            }
+            eventHandler.emit("event", event);
+
+            if(event.event == "thread.message.completed") {
+				response = event.data.content[0].text.value;
+			}
         }
 
         const cleanedString = response.replace(/```json|```/g, '').trim();
 
         return JSON.parse(cleanedString);
+        //*********************************************** */
     } catch (error) {
         console.log(JSON.stringify(error, null, 2));
         reply.code(500).send({ error: error });
