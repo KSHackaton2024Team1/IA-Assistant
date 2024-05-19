@@ -92,7 +92,7 @@ fastify.post('/welcome', async (request, reply) => {
             }
         }
 
-        const cleanedString = inputString.replace(/```json|```/g, '').trim();
+        const cleanedString = response.replace(/```json|```/g, '').trim();
 
         return JSON.parse(cleanedString);
     } catch (error) {
