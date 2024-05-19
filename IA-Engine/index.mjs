@@ -116,16 +116,38 @@ fastify.post('/welcome', async (request, reply) => {
             { role: "user", content: `<say hi to ${name} (be creative with the welcome message and just send one dialog) (his/her id is ${id}), return a context as null and options as null, just once>`}
         );
 
-        const stream = await openai.beta.threads.runs.create(
+        // const stream = await openai.beta.threads.runs.create(
+        //     thread,
+        //     { assistant_id: fastify.config.ASSISTANT_ID, stream: true }
+        // );
+
+        // let response;
+        // for await (const event of stream) {
+        //     if(event.event === 'thread.message.completed') {
+        //         response = event.data.content[0].text.value;
+        //     }
+        // }
+
+        // const cleanedString = response.replace(/```json|```/g, '').trim();
+
+        // return JSON.parse(cleanedString);
+
+        const eventHandler = new EventHandler(openai, conn);
+        eventHandler.on("event", eventHandler.onEvent.bind(eventHandler));
+        const stream = await client.beta.threads.runs.stream(
             thread,
-            { assistant_id: fastify.config.ASSISTANT_ID, stream: true }
+            { assistant_id: fastify.config.ASSISTANT_ID },
+            eventHandler,
         );
 
         let response;
         for await (const event of stream) {
-            if(event.event === 'thread.message.completed') {
-                response = event.data.content[0].text.value;
-            }
+            fastify.log.info(event.event);
+            eventHandler.emit("event", event);
+
+            if(event.event == "thread.message.completed") {
+				response = event.data.content[0].text.value;
+			}
         }
 
         const cleanedString = response.replace(/```json|```/g, '').trim();
