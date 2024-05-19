@@ -116,36 +116,36 @@ fastify.post('/welcome', async (request, reply) => {
             { role: "user", content: `<say hi to ${name} (be creative with the welcome message and just send one dialog) (his/her id is ${id}), return a context as null and options as null, just once>`}
         );
 
-        // const stream = await openai.beta.threads.runs.create(
-        //     thread,
-        //     { assistant_id: fastify.config.ASSISTANT_ID, stream: true }
-        // );
-
-        // let response;
-        // for await (const event of stream) {
-        //     if(event.event === 'thread.message.completed') {
-        //         response = event.data.content[0].text.value;
-        //     }
-        // }
-
-        // const cleanedString = response.replace(/```json|```/g, '').trim();
-
-        // return JSON.parse(cleanedString);
-
         const stream = await openai.beta.threads.runs.create(
             thread,
             { assistant_id: fastify.config.ASSISTANT_ID, stream: true }
         );
-        const eventHandler = new EventHandler(openai, conn);
 
         let response;
         for await (const event of stream) {
-            response = await eventHandler.onEvent(event);
+            if(event.event === 'thread.message.completed') {
+                response = event.data.content[0].text.value;
+            }
         }
 
         const cleanedString = response.replace(/```json|```/g, '').trim();
 
         return JSON.parse(cleanedString);
+
+        // const stream = await openai.beta.threads.runs.create(
+        //     thread,
+        //     { assistant_id: fastify.config.ASSISTANT_ID, stream: true }
+        // );
+        // const eventHandler = new EventHandler(openai, conn);
+
+        // let response;
+        // for await (const event of stream) {
+        //     response = await eventHandler.onEvent(event);
+        // }
+
+        // const cleanedString = response.replace(/```json|```/g, '').trim();
+
+        // return JSON.parse(cleanedString);
     } catch (error) {
         console.log(JSON.stringify(error, null, 2));
         reply.code(500).send({ error: error });
@@ -163,24 +163,6 @@ fastify.post('/message', async (request, reply) => {
             }`}
         );
 
-        // const stream = await openai.beta.threads.runs.create(
-        //     thread,
-        //     { assistant_id: fastify.config.ASSISTANT_ID, stream: true }
-        // );
-
-        // let response;
-        // for await (const event of stream) {
-        //     if(event.event === 'thread.message.completed') {
-        //         response = event.data.content[0].text.value;
-        //     }
-        // }
-
-        // const cleanedString = response.replace(/```json|```/g, '').trim();
-
-        // return JSON.parse(cleanedString);
-
-        //*********************************************** */
-        const eventHandler = new EventHandler(openai, conn);
         const stream = await openai.beta.threads.runs.create(
             thread,
             { assistant_id: fastify.config.ASSISTANT_ID, stream: true }
@@ -188,12 +170,30 @@ fastify.post('/message', async (request, reply) => {
 
         let response;
         for await (const event of stream) {
-            response = await eventHandler.onEvent(event);
+            if(event.event === 'thread.message.completed') {
+                response = event.data.content[0].text.value;
+            }
         }
 
         const cleanedString = response.replace(/```json|```/g, '').trim();
 
         return JSON.parse(cleanedString);
+
+        //*********************************************** */
+        // const eventHandler = new EventHandler(openai, conn);
+        // const stream = await openai.beta.threads.runs.create(
+        //     thread,
+        //     { assistant_id: fastify.config.ASSISTANT_ID, stream: true }
+        // );
+
+        // let response;
+        // for await (const event of stream) {
+        //     response = await eventHandler.onEvent(event);
+        // }
+
+        // const cleanedString = response.replace(/```json|```/g, '').trim();
+
+        // return JSON.parse(cleanedString);
         //*********************************************** */
     } catch (error) {
         fastify.log.info(JSON.stringify(error, null, 2));
