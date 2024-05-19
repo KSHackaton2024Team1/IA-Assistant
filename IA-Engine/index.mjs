@@ -158,4 +158,13 @@ fastify.get('/models', async (request, reply) => {
     return list;
 });
 
+fastify.get('/run/:threadId/:runId', async (request, reply) => {
+    const { threadId, runId } = request.params;
+    const run = await openai.beta.threads.runs.retrieve(
+        threadId,
+        runId
+    );
+    return run;
+});
+
 start();
