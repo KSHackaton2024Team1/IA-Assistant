@@ -42,12 +42,15 @@ export class EventHandler {
 					let { id } = JSON.parse(toolCall.function.arguments);
 
 					let response = await getPatientProperties(this.conn, id);
+					console.log(JSON.stringify(response));
 					return {
 						tool_call_id: toolCall.id,
 						output: JSON.stringify(response),
 					};
 				}
 			});
+
+			console.log("toolOutputs: " + toolOutputs);
 			// Submit all the tool outputs at the same time
 			await this.submitToolOutputs(toolOutputs, runId, threadId);
 		} catch (error) {
