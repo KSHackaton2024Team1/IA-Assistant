@@ -23,32 +23,33 @@ export class EventHandler {
 
 	async handleRequiresAction(data, runId, threadId) {
 		try {
-			const toolOutputs =
-			await data.required_action.submit_tool_outputs.tool_calls.map(async (toolCall) => {
-				console.log("tool_calls.map");
-				if (toolCall.function.name === "setPatientProperties") {
-					console.log("setPatientProperties: " + toolCall.function.arguments);
-					let { id, weight, height, mobile, age } = JSON.parse(toolCall.function.arguments);
-
-					let response = await setPatientProperties(this.conn, { id, weight, height, mobile, age });
-					return {
-						tool_call_id: toolCall.id,
-						output: JSON.stringify(response),
-					};
-				} else if (toolCall.function.name === "getPatientInformation") {
-					console.log("getPatientInformation");
-					console.log('getPatientInformation ' + toolCall.function.arguments);
-					console.log('getPatientInformation ' + toolCall.id);
-					let { id } = JSON.parse(toolCall.function.arguments);
-
-					let response = await getPatientProperties(this.conn, id);
-					console.log(JSON.stringify(response));
-					return {
-						tool_call_id: toolCall.id,
-						output: JSON.stringify(response),
-					};
-				}
-			});
+			const toolOutputs = await Promise.all(
+				data.required_action.submit_tool_outputs.tool_calls.map(async (toolCall) => {
+					console.log("tool_calls.map");
+					if (toolCall.function.name === "setPatientProperties") {
+						console.log("setPatientProperties: " + toolCall.function.arguments);
+						let { id, weight, height, mobile, age } = JSON.parse(toolCall.function.arguments);
+		
+						let response = await setPatientProperties(this.conn, { id, weight, height, mobile, age });
+						return {
+							tool_call_id: toolCall.id,
+							output: JSON.stringify(response),
+						};
+					} else if (toolCall.function.name === "getPatientInformation") {
+						console.log("getPatientInformation");
+						console.log('getPatientInformation ' + toolCall.function.arguments);
+						console.log('getPatientInformation ' + toolCall.id);
+						let { id } = JSON.parse(toolCall.function.arguments);
+		
+						let response = await getPatientProperties(this.conn, id);
+						console.log(JSON.stringify(response));
+						return {
+							tool_call_id: toolCall.id,
+							output: JSON.stringify(response),
+						};
+					}
+				})
+			);
 
 			console.log("toolOutputs: " + toolOutputs);
 			// Submit all the tool outputs at the same time
