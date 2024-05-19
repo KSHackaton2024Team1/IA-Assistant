@@ -17,7 +17,7 @@ const fastify = Fastify({
 const start = async () => {
     const schema = {
         type: 'object',
-        required: [ 'OPENAI_API_KEY', 'BASIC_USERNAME', 'BASIC_PASSWORD', 'ASSISTANT_ID', 'LOGIN_URL', 'CLIENT_ID', 'CLIENT_SECRET', 'REDIRECT_URI', 'USERNAME', 'PASSWORD', 'SECURITY'],
+        required: [ 'OPENAI_API_KEY', 'BASIC_USERNAME', 'BASIC_PASSWORD', 'ASSISTANT_ID', 'LOGIN_URL', 'CLIENT_ID', 'CLIENT_SECRET', 'REDIRECT_URI', 'USERNAME', 'PASSWORD', 'SECURITY_TOKEN'],
         properties: {
             OPENAI_API_KEY: {
                 type: 'string'
