@@ -88,6 +88,7 @@ fastify.post('/welcome', async (request, reply) => {
         for await (const event of stream) {
             if(event.event === 'thread.message.completed') {
                 response = event.data.content[0].text.value;
+                console.log(response);
             }
         }
 
