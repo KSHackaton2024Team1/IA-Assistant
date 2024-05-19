@@ -51,7 +51,7 @@ export class EventHandler {
 				})
 			);
 
-			console.log("toolOutputs: " + toolOutputs);
+			console.log("toolOutputs: " + JSON.stringify(toolOutputs, null, 2));
 			// Submit all the tool outputs at the same time
 			await this.submitToolOutputs(toolOutputs, runId, threadId);
 		} catch (error) {
