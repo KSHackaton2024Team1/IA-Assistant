@@ -36,7 +36,7 @@ export class EventHandler extends EventEmitter {
 					let response = await setPatientProperties(this.conn, { id, weight, height, mobile, age });
 					return {
 						tool_call_id: toolCall.id,
-						output: response,
+						output: JSON.stringify(response),
 					};
 				} else if (toolCall.function.name === "getPatientInformation") {
 					console.log("getPatientInformation");
@@ -45,7 +45,7 @@ export class EventHandler extends EventEmitter {
 					let response = await getPatientProperties(this.conn, id);
 					return {
 						tool_call_id: toolCall.id,
-						output: response,
+						output: JSON.stringify(response),
 					};
 				}
 			});
