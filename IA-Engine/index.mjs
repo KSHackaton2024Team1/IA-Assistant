@@ -84,9 +84,11 @@ fastify.post('/welcome', async (request, reply) => {
             { assistant_id: "asst_ax6rKbDv3pwzofLyptMBgwrB", stream: true }
         );
 
-        let response = [];
+        let response;
         for await (const event of stream) {
-            response.push(event);
+            if(event.event === 'thread.message.completed') {
+                response = event.data.content[0].text.value;
+            }
         }
 
         return response;
