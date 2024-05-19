@@ -1,5 +1,5 @@
 import { setPatientProperties, getPatientProperties } from './sf-utils.mjs';
-
+import { EventEmitter } from 'events';
 export class EventHandler extends EventEmitter {
 	constructor(client, conn) {
 		super();
