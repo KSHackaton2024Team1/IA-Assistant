@@ -10,15 +10,15 @@ export class EventHandler {
 			// Retrieve events that are denoted with 'requires_action'
 			// since these will have our tool_calls
 			if (event.event === "thread.run.requires_action") {
-				await this.handleRequiresAction(
+				if(event.event == "thread.message.completed") {
+					return event.data.content[0].text.value;
+				}
+
+				return await this.handleRequiresAction(
 					event.data,
 					event.data.id,
 					event.data.thread_id,
 				);
-
-				if(event.event == "thread.message.completed") {
-					return event.data.content[0].text.value;
-				}
 			}
 		} catch (error) {
 			console.error("Error handling event:", error);
@@ -57,7 +57,7 @@ export class EventHandler {
 
 			console.log("toolOutputs: " + JSON.stringify(toolOutputs, null, 2));
 			// Submit all the tool outputs at the same time
-			await this.submitToolOutputs(toolOutputs, runId, threadId);
+			return await this.submitToolOutputs(toolOutputs, runId, threadId);
 		} catch (error) {
 			console.error("Error processing required action:", error);
 			console.error(JSON.stringify(error, null, 2));
