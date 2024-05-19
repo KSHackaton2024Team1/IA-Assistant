@@ -37,6 +37,8 @@ export class EventHandler {
 					};
 				} else if (toolCall.function.name === "getPatientInformation") {
 					console.log("getPatientInformation");
+					console.log('getPatientInformation ' + toolCall.function.arguments);
+					console.log('getPatientInformation ' + toolCall.id);
 					let { id } = JSON.parse(toolCall.function.arguments);
 
 					let response = await getPatientProperties(this.conn, id);
