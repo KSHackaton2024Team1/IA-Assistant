@@ -15,6 +15,10 @@ export class EventHandler {
 					event.data.id,
 					event.data.thread_id,
 				);
+
+				if(event.event == "thread.message.completed") {
+					return event.data.content[0].text.value;
+				}
 			}
 		} catch (error) {
 			console.error("Error handling event:", error);
@@ -68,6 +72,15 @@ export class EventHandler {
 				runId,
 				{ tool_outputs: toolOutputs },
 			);
+
+			let response;
+			for await (const event of stream) {
+				if(event.event == "thread.message.completed") {
+					response = event.data.content[0].text.value;
+				}
+			}
+
+			return response;
 		} catch (error) {
 			console.error("Error submitting tool outputs:", error);
 		}

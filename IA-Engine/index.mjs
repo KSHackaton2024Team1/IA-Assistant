@@ -140,11 +140,7 @@ fastify.post('/welcome', async (request, reply) => {
 
         let response;
         for await (const event of stream) {
-            await eventHandler.onEvent(event);
-
-            if(event.event == "thread.message.completed") {
-				response = event.data.content[0].text.value;
-			}
+            response = await eventHandler.onEvent(event);
         }
 
         const cleanedString = response.replace(/```json|```/g, '').trim();
@@ -192,11 +188,7 @@ fastify.post('/message', async (request, reply) => {
 
         let response;
         for await (const event of stream) {
-            await eventHandler.onEvent(event);
-
-            if(event.event == "thread.message.completed") {
-				response = event.data.content[0].text.value;
-			}
+            response = await eventHandler.onEvent(event);
         }
 
         const cleanedString = response.replace(/```json|```/g, '').trim();
