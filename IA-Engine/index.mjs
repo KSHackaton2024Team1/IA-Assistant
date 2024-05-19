@@ -108,7 +108,7 @@ fastify.post('/message', async (request, reply) => {
     try {
         const threadMessages = await openai.beta.threads.messages.create(
             thread,
-            { role: "user", content: message `{
+            { role: "user", content: `{
                 "context": ${context}
                 "message": ${message}
             }`}
