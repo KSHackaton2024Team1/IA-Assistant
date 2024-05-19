@@ -175,6 +175,7 @@ fastify.post('/message', async (request, reply) => {
 
         let response;
         for await (const event of stream) {
+            console.log(event.event);
             eventHandler.emit("event", event);
 
             if(event.event == "thread.message.completed") {
