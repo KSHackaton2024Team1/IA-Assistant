@@ -68,9 +68,6 @@ export class EventHandler {
 				runId,
 				{ tool_outputs: toolOutputs },
 			);
-			for await (const event of stream) {
-				this.emit("event", event);
-			}
 		} catch (error) {
 			console.error("Error submitting tool outputs:", error);
 		}
