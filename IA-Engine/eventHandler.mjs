@@ -9,11 +9,11 @@ export class EventHandler {
 		try {
 			// Retrieve events that are denoted with 'requires_action'
 			// since these will have our tool_calls
-			if (event.event === "thread.run.requires_action") {
-				if(event.event == "thread.message.completed") {
-					return event.data.content[0].text.value;
-				}
+			if(event.event == "thread.message.completed") {
+				return event.data.content[0].text.value;
+			}
 
+			if (event.event === "thread.run.requires_action") {				
 				return await this.handleRequiresAction(
 					event.data,
 					event.data.id,
