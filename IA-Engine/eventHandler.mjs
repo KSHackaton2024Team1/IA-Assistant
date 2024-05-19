@@ -28,6 +28,7 @@ export class EventHandler extends EventEmitter {
 		try {
 			const toolOutputs =
 			data.required_action.submit_tool_outputs.tool_calls.map(async (toolCall) => {
+				console.log("tool_calls.map");
 				if (toolCall.function.name === "setPatientProperties") {
 					console.log("setPatientProperties: " + toolCall.function.arguments);
 					let { id, weight, height, mobile, age } = JSON.parse(toolCall.function.arguments);
@@ -52,6 +53,7 @@ export class EventHandler extends EventEmitter {
 			await this.submitToolOutputs(toolOutputs, runId, threadId);
 		} catch (error) {
 			console.error("Error processing required action:", error);
+			console.error(JSON.stringify(error, null, 2));
 		}
 	}
 
