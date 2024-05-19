@@ -91,7 +91,7 @@ fastify.post('/welcome', async (request, reply) => {
             }
         }
 
-        return response;
+        return JSON.parse(response);
     } catch (error) {
         console.log(JSON.stringify(error, null, 2));
         reply.code(500).send({ error: error });
